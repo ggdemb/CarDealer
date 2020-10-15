@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AssemblyName>CarDealer.Domain</AssemblyName>
+    <RootNamespace>CarDealer.Domain</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Customer\**" />
+    <Compile Remove="Insurance\**" />
+    <Compile Remove="Order\**" />
+    <Compile Remove="PickingUp\**" />
+    <Compile Remove="Sale\Customer\**" />
+    <Compile Remove="Sale\Insurance\**" />
+    <Compile Remove="Sale\Order\**" />
+    <Compile Remove="Sale\PickingUp\**" />
+    <EmbeddedResource Remove="Customer\**" />
+    <EmbeddedResource Remove="Insurance\**" />
+    <EmbeddedResource Remove="Order\**" />
+    <EmbeddedResource Remove="PickingUp\**" />
+    <EmbeddedResource Remove="Sale\Customer\**" />
+    <EmbeddedResource Remove="Sale\Insurance\**" />
+    <EmbeddedResource Remove="Sale\Order\**" />
+    <EmbeddedResource Remove="Sale\PickingUp\**" />
+    <None Remove="Customer\**" />
+    <None Remove="Insurance\**" />
+    <None Remove="Order\**" />
+    <None Remove="PickingUp\**" />
+    <None Remove="Sale\Customer\**" />
+    <None Remove="Sale\Insurance\**" />
+    <None Remove="Sale\Order\**" />
+    <None Remove="Sale\PickingUp\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Common\Repository.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.9" />
+  </ItemGroup>
+
+</Project>
