@@ -22,7 +22,10 @@ namespace CarDealer.Domain.Sale.Car
             BasePrice = basePrice ?? throw new ArgumentNullException(nameof(basePrice));
             IsReserved = isReserved;
         }
-
+        public void ToggleReservationState()
+        {
+            IsReserved = !IsReserved;
+        }
         public Result CanUpdatePrice()
         {
             var validationResults = "";

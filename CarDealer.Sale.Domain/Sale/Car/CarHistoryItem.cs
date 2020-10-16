@@ -5,10 +5,9 @@ namespace CarDealer.Domain.Sale.Car
 {
     public class CarHistoryItem : Entity
     {
-        public DateTime DateOfItem { get; }
-        public CarMileage Mileage { get; }
-        public string Description { get; }
-        public int AvailibleCarId { get; set; }
-
+        public DateTime DateOfItem { get; private set; }
+        public CarMileage Mileage { get; private set; }
+        public string Description { get; private set; }
+        public long AvailibleCarId { get; private set; }
     }
 }

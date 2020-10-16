@@ -10,7 +10,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CarDealer.Application\CarDealer.Application.csproj" />
-    <ProjectReference Include="..\CarDealer.Sale.Domain\CarDealer.Domain.csproj" />
   </ItemGroup>
 
 </Project>

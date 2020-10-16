@@ -9,24 +9,24 @@ namespace CarDealer.Domain.Sale.Car
         {
 
         }
-        public CarName(string brandName, string modelName) : this()
+        public CarName(string brand, string model) : this()
         {
-            BrandName = brandName;
-            ModelName = modelName;
+            Brand = brand;
+            Model = model;
         }
 
-        public string BrandName { get; private set; }
-        public string ModelName { get; private set; }
+        public string Brand { get; private set; }
+        public string Model { get; private set; }
 
         protected override IEnumerable<object> GetEqualityComponents()
         {
-            yield return BrandName;
-            yield return ModelName;
+            yield return Brand;
+            yield return Model;
         }
 
         public override string ToString()
         {
-            return $"{ModelName} {BrandName}";
+            return $"{Model} {Brand}";
         }
     }
 }

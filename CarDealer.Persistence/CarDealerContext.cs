@@ -12,10 +12,15 @@ namespace CarDealer.Persistence
     public class CarDealerContext : DbContext, ICarDealerContext
     {
         private readonly List<IDomainEvent> _domainEvents;
+        private readonly ICurrentUserService _currentUserService;
+        private readonly IDateTime _dateTime;
 
-        public CarDealerContext() : base()
+        public CarDealerContext(DbContextOptions options, ICurrentUserService currentUserService,
+            IDateTime dateTime) : base(options)
         {
             _domainEvents = new List<IDomainEvent>();
+            _currentUserService = currentUserService;
+            _dateTime = dateTime;
         }
 
         public DbSet<AvailibleCar> AvailibleCars { get; set; }
@@ -23,7 +28,7 @@ namespace CarDealer.Persistence
         public override int SaveChanges()
         {
             base.ChangeTracker.DetectChanges();
-            var timestamp = DateTime.Now;
+            var timestamp = _dateTime.Now;
             foreach (var entry in base.ChangeTracker.Entries().Where(e => (e.State == EntityState.Added || e.State == EntityState.Modified)
                 && !e.Metadata.IsOwned())) // OwnedTypes are ValueObjects
             {
@@ -33,12 +38,16 @@ namespace CarDealer.Persistence
             return base.SaveChanges();
         }
 
-        private static void FillAuditProperties(DateTime timestamp, EntityEntry entry)
+        private void FillAuditProperties(DateTime timestamp, EntityEntry entry)
         {
             //shadow properties changes:
-            entry.Property(" LastModified ").CurrentValue = timestamp;
+            entry.Property("LastModified").CurrentValue = timestamp;
+            entry.Property("LastModifiedBy").CurrentValue = _currentUserService.Login;
             if (entry.State == EntityState.Added)
-                entry.Property(" Created ").CurrentValue = timestamp;
+            {
+                entry.Property("Created").CurrentValue = timestamp;
+                entry.Property("CreatedBy").CurrentValue = _currentUserService.Login;
+            }
         }
 
         private void CollectDomainEvents(EntityEntry entry)
@@ -73,12 +82,16 @@ namespace CarDealer.Persistence
             }
             );
 
+            modelBuilder.Entity<CarHistoryItem>().OwnsOne(x => x.Mileage);
 
-            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes().Where(e => !e.IsOwned()))
             {
                 //shadow properties for all entities in CarDealerContext:
                 modelBuilder.Entity(entityType.Name).Property<DateTime>("Created");
+                modelBuilder.Entity(entityType.Name).Property<string>("CreatedBy");
                 modelBuilder.Entity(entityType.Name).Property<DateTime>("LastModified");
+                modelBuilder.Entity(entityType.Name).Property<string>("LastModifiedBy");
             }
             base.OnModelCreating(modelBuilder);
         }

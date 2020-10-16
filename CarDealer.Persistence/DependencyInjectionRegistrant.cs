@@ -15,9 +15,11 @@ namespace CarDealer.Persistence
                     options.UseSqlServer(
                         configuration.GetConnectionString("DefaultConnection"),
                         b => b.MigrationsAssembly(typeof(CarDealerContext).Assembly.FullName)));
-            services.AddScoped<ICarDealerContext>(provider => provider.GetService<CarDealerContext>());
-            services.AddScoped<ICarRepository>(provider => provider.GetService<CarRepository>());
-            services.AddScoped<IUnitOfWork>(provider => provider.GetService<UnitOfWork>());
+            services.AddScoped<ICarDealerContext, CarDealerContext>();
+            //services.AddScoped<IUnitOfWorkContext>(provider => provider.GetService<CarDealerContext>()); add same context 
+            // object as diffrent interface - you need this in UnitOfWork implementation. You have to sure it use the same instance.
+            services.AddScoped<ICarRepository, CarRepository>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             return services;
         }

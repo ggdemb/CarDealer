@@ -7,6 +7,7 @@ namespace CarDealer.Persistence.Repositories.Sale
     {
         public AvailibleCar GetAvailibleCar(long availibleCarId)
         {
+            //what to return? Result<AvailibleCar> or AvailibleCar and null?
             throw new System.NotImplementedException();
         }
 

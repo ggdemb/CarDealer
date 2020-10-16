@@ -1,13 +1,13 @@
-﻿using CarDealer.Persistence;
+﻿using CarDealer.Application.CommonContracts;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Utils
 {
     public class BaseController : Controller
     {
-        private readonly UnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public BaseController(UnitOfWork unitOfWork)
+        public BaseController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }

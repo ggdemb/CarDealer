@@ -1,4 +1,5 @@
 ﻿using CarDealer.Application;
+using CarDealer.Application.CommonContracts;
 using CarDealer.Persistence;
 using CarDealer.Sale.Domain;
 using Microsoft.AspNetCore.Builder;
@@ -8,32 +9,6 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Api.Utils
 {
-    //public class Startup
-    //{
-    //    public Startup(IConfiguration configuration)
-    //    {
-    //        Configuration = configuration;
-    //    }
-
-    //    public IConfiguration Configuration { get; }
-
-    //    public void ConfigureServices(IServiceCollection services)
-    //    {
-    //        services.AddMvc();
-
-    //        services.AddSingleton(new SessionFactory(Configuration["ConnectionString"]));
-    //        services.AddScoped<UnitOfWork>();
-    //        services.AddTransient<MovieRepository>();
-    //        services.AddTransient<CustomerRepository>();
-    //    }
-
-    //    public void Configure(IApplicationBuilder app)
-    //    {
-    //        app.UseMiddleware<ExceptionHandler>();
-    //        app.UseMvc();
-    //    }
-    //}
-
     public class Startup
     {
         public Startup(IConfiguration configuration, IWebHostEnvironment environment)
@@ -48,16 +23,26 @@ namespace Api.Utils
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddControllers();
+
             services.RegisterPersistanceDependencyInjection(Configuration);
             services.RegisterApplicationDependencyInjection();
             services.RegisterDomainDependencyInjection();
+            services.RegisterApiDependencyInjection();
 
-            services.AddControllers();
+            services.AddSwaggerGen();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app)
         {
+            app.UseSwagger();
+
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                c.RoutePrefix = string.Empty;
+            });
             app.UseMiddleware<ExceptionHandler>();
 
             app.UseHttpsRedirection();
