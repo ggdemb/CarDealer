@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CarDealer.Application\CarDealer.Application.csproj" />
+    <ProjectReference Include="..\CarDealer.Infrastructure\CarDealer.Infrastructure.csproj" />
     <ProjectReference Include="..\CarDealer.Persistence\CarDealer.Persistence.csproj" />
   </ItemGroup>
 

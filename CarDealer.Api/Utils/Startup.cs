@@ -1,5 +1,6 @@
 ﻿using CarDealer.Application;
 using CarDealer.Application.CommonContracts;
+using CarDealer.Infrastructure;
 using CarDealer.Persistence;
 using CarDealer.Sale.Domain;
 using Microsoft.AspNetCore.Builder;
@@ -28,6 +29,7 @@ namespace Api.Utils
             services.RegisterPersistanceDependencyInjection(Configuration);
             services.RegisterApplicationDependencyInjection();
             services.RegisterDomainDependencyInjection();
+            services.RegisterInfrastructureDependencyInjection(Configuration);
             services.RegisterApiDependencyInjection();
 
             services.AddSwaggerGen();
