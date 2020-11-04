@@ -42,7 +42,7 @@ namespace CarDealer.Domain.Sale.Car
         public Result UpdatePrice(decimal newPriceInPln)
         {
             var validationResult = CanUpdatePrice();
-            if (validationResult.Success)
+            if (validationResult.IsSuccess)
             {
                 BasePrice = new Pln(newPriceInPln);
                 AddDomainEvent(new AvailbleCarPriceChanged(Id, newPriceInPln));
@@ -56,26 +56,6 @@ namespace CarDealer.Domain.Sale.Car
 
         public static Result CanCreateCar(CarName name, Engine engine, TransmissionType transmission, CarMileage currentMileage, Pln basePrice)
         {
-            //do not mix application error with bussines errors (Result is only for bussines errors)
-            if (name is null)
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
-            if (engine is null)
-            {
-                throw new ArgumentNullException(nameof(engine));
-            }
-
-            if (currentMileage is null)
-            {
-                throw new ArgumentNullException(nameof(currentMileage));
-            }
-
-            if (basePrice is null)
-            {
-                throw new ArgumentNullException(nameof(basePrice));
-            }
-
             // you can place your bussines validations here:
             // todo: maybe Result shoud have collections of strings for error messages, or even better collection of objects with Code, and Message
             var validationResults = "";
@@ -91,7 +71,7 @@ namespace CarDealer.Domain.Sale.Car
         public static Result<AvailibleCar> CreateCar(CarName name, Engine engine, TransmissionType transmission, CarMileage currentMileage, Pln basePrice)
         {
             var validationResult = CanCreateCar(name, engine, transmission, currentMileage, basePrice);
-            if (validationResult.Success)
+            if (validationResult.IsSuccess)
             {
                 var newCar = new AvailibleCar(name, engine, transmission, currentMileage, basePrice);
                 //AddDomainEvent(new AvailbleCarCreated(Id));

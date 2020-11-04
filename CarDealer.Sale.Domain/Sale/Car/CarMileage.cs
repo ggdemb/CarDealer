@@ -30,5 +30,15 @@ namespace CarDealer.Domain.Sale.Car
         {
             yield return MileageInKm;
         }
+
+        //public static explicit operator Email(string email)
+        //{
+        //    return Create(email).Value;
+        //}
+
+        //public static implicit operator string(Email email)
+        //{
+        //    return email.Value;
+        //}
     }
 }

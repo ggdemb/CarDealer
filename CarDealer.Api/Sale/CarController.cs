@@ -1,24 +1,40 @@
 ﻿using Api.Utils;
+using CarDealer.Api.Common;
 using CarDealer.Application.CommonContracts;
-using CarDealer.Application.Sale;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Threading.Tasks;
 
 namespace CarDealer.Api.Sale
 {
-    public class CarController : BaseController
+    public class CarController: ApiController
     {
-        private readonly ICarService _carService;
-        public CarController(IUnitOfWork unitOfWork, ICarService carService) : base(unitOfWork)
+        public CarController(IUnitOfWork unitOfWork) : base(unitOfWork)
         {
-            _carService = carService ?? throw new ArgumentNullException(nameof(carService));
         }
 
-        [HttpPut("[action]")]
-        public IActionResult UpdateCarPrice(long availbleCarId, decimal newPrice)
+        [HttpPost]
+        public async Task<ActionResult<long>> Create(CreateTodoItemCommand command)
         {
-            _carService.ChangeAvailibleCarPrice(availbleCarId, newPrice);
-            return Ok();
+            return await Mediator.Send(command);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<Envelope<int>>> Update(long id, UpdateTodoItemCommand command)
+        {
+            if (id != command.Id)
+            {
+                return BadRequest();
+            }
+
+            await Mediator.Send(command);
+
+            return Ok<int>(1234);
+        }
+
+        private ActionResult BadRequest()
+        {
+            throw new NotImplementedException();
         }
     }
 }

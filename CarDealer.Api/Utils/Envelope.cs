@@ -1,25 +1,26 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Api.Utils
 {
     public class Envelope<T>
     {
         public T Result { get; }
-        public string ErrorMessage { get; }
+        public List<string> ErrorMessages { get; }
         public DateTime TimeGenerated { get; }
 
-        protected internal Envelope(T result, string errorMessage)
+        protected internal Envelope(T result, List<string> errorMessages)
         {
             Result = result;
-            ErrorMessage = errorMessage;
+            ErrorMessages = errorMessages;
             TimeGenerated = DateTime.UtcNow;
         }
     }
 
     public class Envelope : Envelope<string>
     {
-        protected Envelope(string errorMessage)
-            : base(null, errorMessage)
+        protected Envelope(List<string> errorMessages)
+            : base(null, errorMessages)
         {
         }
 
@@ -33,9 +34,13 @@ namespace Api.Utils
             return new Envelope(null);
         }
 
+        public static Envelope Error(List<string> errorMessages)
+        {
+            return new Envelope(errorMessages);
+        }
         public static Envelope Error(string errorMessage)
         {
-            return new Envelope(errorMessage);
+            return new Envelope(new List<string>() { errorMessage });
         }
     }
 }

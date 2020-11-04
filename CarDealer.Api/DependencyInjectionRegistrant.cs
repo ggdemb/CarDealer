@@ -1,6 +1,8 @@
-﻿using CarDealer.Api.Common;
+﻿using Api.Utils;
+using CarDealer.Api.Common;
 using CarDealer.Application.CommonContracts;
-using CarDealer.Application.Sale;
+using MediatR;
+using MediatR.Pipeline;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CarDealer.Application
@@ -10,7 +12,8 @@ namespace CarDealer.Application
         public static IServiceCollection RegisterApiDependencyInjection(this IServiceCollection services)
         {
             services.AddScoped<ICurrentUserService, CurrentUserService>();
-
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RequestPerformanceBehaviour<,>));
+            services.AddTransient(typeof(IRequestPreProcessor<>), typeof(RequestLogger<>));
             return services;
         }
     }

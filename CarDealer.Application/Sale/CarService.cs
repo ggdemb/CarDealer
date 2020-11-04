@@ -15,7 +15,7 @@ namespace CarDealer.Application.Sale
         {
             var carToChange = _carRepository.GetAvailibleCar(availbleCarId);
 
-            if (carToChange.CanUpdatePrice().Success)
+            if (carToChange.CanUpdatePrice().IsSuccess)
             {
                 carToChange.UpdatePrice(newPriceInPln);
             }
