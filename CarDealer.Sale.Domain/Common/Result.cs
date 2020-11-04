@@ -1,75 +1,72 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CarDealer.Domain.Common
 {
     //https://enterprisecraftsmanship.com/posts/functional-c-handling-failures-input-errors/
     public class Result
     {
-        public bool Success { get; private set; }
-        public string Error { get; private set; }
-
-        public bool Failure
+        public bool IsSuccess => Errors.Any();
+        public List<string> Errors { get; }
+        public bool IsFailure => !IsSuccess;
+        protected Result()
         {
-            get { return !Success; }
+            Errors = new List<string>();
+        }
+        protected Result(List<string> errors)
+        {
+            Errors = errors;
+        }
+        protected Result(string error) : this()
+        {
+            if (error != string.Empty)
+                Errors.Add(error);
         }
 
-        protected Result(bool success, string error)
+        public void AddError(string error)
         {
-            Success = success;
-            Error = error;
+            Errors.Add(error);
         }
 
         public static Result Fail(string message)
         {
-            return new Result(false, message);
+            return new Result(message);
         }
 
         public static Result<T> Fail<T>(string message)
         {
-            return new Result<T>(default(T), false, message);
+            return new Result<T>(default(T), message);
+        }
+        public static Result<T> Fail<T>(List<string> messages)
+        {
+            return new Result<T>(default(T), messages);
         }
 
         public static Result Ok()
         {
-            return new Result(true, String.Empty);
+            return new Result();
         }
 
         public static Result<T> Ok<T>(T value)
         {
-            return new Result<T>(value, true, String.Empty);
-        }
-
-        public static Result Combine(params Result[] results)
-        {
-            foreach (Result result in results)
-            {
-                if (result.Failure)
-                    return result;
-            }
-
-            return Ok();
+            return new Result<T>(value, string.Empty);
         }
     }
 
 
     public class Result<T> : Result
     {
-        private T _value;
-
-        public T Value
+        public T Value { get; }
+        protected internal Result(T value, string error)
+            : base(error)
         {
-            get
-            {
-                return _value;
-            }
-            private set { _value = value; }
+            Value = value;
         }
-
-        protected internal Result(T value, bool success, string error)
-            : base(success, error)
+        protected internal Result(T value, List<string> errors)
+           : base(errors)
         {
             Value = value;
         }
     }
-
 }
