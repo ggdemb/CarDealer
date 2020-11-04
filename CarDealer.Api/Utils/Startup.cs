@@ -3,10 +3,13 @@ using CarDealer.Application.CommonContracts;
 using CarDealer.Infrastructure;
 using CarDealer.Persistence;
 using CarDealer.Sale.Domain;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace Api.Utils
 {
@@ -31,12 +34,13 @@ namespace Api.Utils
             services.RegisterDomainDependencyInjection();
             services.RegisterInfrastructureDependencyInjection(Configuration);
             services.RegisterApiDependencyInjection();
+            services.AddAntiforgery(options => options.HeaderName = "X-XSRF-TOKEN");
 
             services.AddSwaggerGen();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app)
+        public void Configure(IApplicationBuilder app, IAntiforgery antiforgery)
         {
             app.UseSwagger();
 
@@ -56,6 +60,21 @@ namespace Api.Utils
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+            });
+
+            //CSRF protection: https://blog.gerardbeckerleg.com/posts/xsrf-with-angular-and-dot-net-core-web-api/
+            app.Use(next => context =>
+            {
+                string path = context.Request.Path.Value;
+
+                if (
+                    string.Equals(path, "/", StringComparison.OrdinalIgnoreCase))
+                {
+                    var tokens = antiforgery.GetAndStoreTokens(context);
+                    context.Response.Cookies.Append("XSRF-TOKEN", tokens.RequestToken,
+                        new CookieOptions() { HttpOnly = false });
+                }
+                return next(context);
             });
         }
     }
