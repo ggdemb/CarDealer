@@ -5,7 +5,6 @@ namespace CarDealer.Domain.Common
     public abstract class Entity
     {
         public virtual long Id { get; protected set; }
-        public bool IsDeleted { get; protected set; }
 
         public override bool Equals(object obj)
         {

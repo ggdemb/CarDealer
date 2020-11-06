@@ -24,6 +24,7 @@ namespace CarDealer.Persistence
         }
 
         public DbSet<AvailibleCar> AvailibleCars { get; set; }
+        public DbSet<CarState> CarStates { get; set; }
         public DbSet<CarHistoryItem> CarHistoryItems { get; set; }
         public override int SaveChanges()
         {
@@ -70,6 +71,13 @@ namespace CarDealer.Persistence
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            //Table-Per-Hierarchy - to deliver dedicated behaviour i OCP way:
+            //https://www.learnentityframeworkcore.com/inheritance
+            modelBuilder.Entity<AvailibleCar>().ToTable("Cars")
+                .HasDiscriminator<CarType>("Type")
+                .HasValue<RegularCar>(CarType.Regular)
+                .HasValue<SportCar>(CarType.Sport);
+
             //ownedTypes configuration:
             modelBuilder.Entity<AvailibleCar>().OwnsOne(x => x.BasePrice);
             modelBuilder.Entity<AvailibleCar>().OwnsOne(x => x.CurrentMileage);

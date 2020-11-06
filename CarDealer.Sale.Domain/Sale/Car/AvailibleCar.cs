@@ -6,25 +6,32 @@ using System.Linq;
 
 namespace CarDealer.Domain.Sale.Car
 {
-    public class AvailibleCar : AggregateRoot
+    public abstract class AvailibleCar : AggregateRoot
     {
-        private AvailibleCar()
+        protected AvailibleCar()
         {
             _carHistory = new List<CarHistoryItem>();
         }
 
-        public AvailibleCar(CarName name, Engine engine, TransmissionType transmission, CarMileage currentMileage, Pln basePrice, bool isReserved = false)
+
+
+        public AvailibleCar(CarName name, Engine engine, TransmissionType transmission, CarMileage currentMileage, Pln basePrice, CarState state, bool isReserved = false)
         {
-            Name = name ?? throw new ArgumentNullException(nameof(name));
-            Engine = engine ?? throw new ArgumentNullException(nameof(engine));
+            Name = name;
+            Engine = engine;
             Transmission = transmission;
-            CurrentMileage = currentMileage ?? throw new ArgumentNullException(nameof(currentMileage));
-            BasePrice = basePrice ?? throw new ArgumentNullException(nameof(basePrice));
+            CurrentMileage = currentMileage;
+            BasePrice = basePrice;
+            State = state;
             IsReserved = isReserved;
         }
         public void ToggleReservationState()
         {
             IsReserved = !IsReserved;
+        }
+        public abstract double TaxBase
+        {
+            get;
         }
         public Result CanUpdatePrice()
         {
@@ -57,7 +64,6 @@ namespace CarDealer.Domain.Sale.Car
         public static Result CanCreateCar(CarName name, Engine engine, TransmissionType transmission, CarMileage currentMileage, Pln basePrice)
         {
             // you can place your bussines validations here:
-            // todo: maybe Result shoud have collections of strings for error messages, or even better collection of objects with Code, and Message
             var validationResults = "";
             if (transmission == TransmissionType.Manual && engine.HasElectricEngine())
                 validationResults += $"Car can't have {engine.Type} engine and {transmission}\n";
@@ -68,19 +74,23 @@ namespace CarDealer.Domain.Sale.Car
             else
                 return Result.Fail(validationResults);
         }
-        public static Result<AvailibleCar> CreateCar(CarName name, Engine engine, TransmissionType transmission, CarMileage currentMileage, Pln basePrice)
+
+        protected static Func<Func<T>, Result<T>> GetCarFactory<T>(CarName name, Engine engine, TransmissionType transmission, CarMileage currentMileage, Pln basePrice, CarState state) where T : AvailibleCar
         {
-            var validationResult = CanCreateCar(name, engine, transmission, currentMileage, basePrice);
-            if (validationResult.IsSuccess)
+            return (constructor) =>
             {
-                var newCar = new AvailibleCar(name, engine, transmission, currentMileage, basePrice);
-                //AddDomainEvent(new AvailbleCarCreated(Id));
-                return Result.Ok(newCar);
-            }
-            else
-            {
-                return Result.Fail<AvailibleCar>($"Validation fail, cannot create {nameof(AvailibleCar)}");
-            }
+                var validationResult = CanCreateCar(name, engine, transmission, currentMileage, basePrice);
+                if (validationResult.IsSuccess)
+                {
+                    var newCar = constructor();
+                    //AddDomainEvent(new AvailbleCarCreated(Id));
+                    return Result.Ok<T>(newCar);
+                }
+                else
+                {
+                    return Result.Fail<T>($"Validation fail, cannot create {typeof(T)}");
+                }
+            };
         }
 
         public void AddHistoryPosition(CarHistoryItem item)
@@ -99,15 +109,23 @@ namespace CarDealer.Domain.Sale.Car
         private readonly List<CarHistoryItem> _carHistory;
         public IReadOnlyList<CarHistoryItem> CarHistory { get => _carHistory.ToList(); }
         public CarName Name { get; private set; }
+        public CarState State { get; private set; }
         public Engine Engine { get; private set; }
         public TransmissionType Transmission { get; private set; }
+        public CarType Type { get; protected set; }
         public CarMileage CurrentMileage { get; private set; }
         public Pln BasePrice { get; private set; }
         public bool IsReserved { get; private set; }
     }
-    public enum TransmissionType
+    public enum TransmissionType : byte
     {
         Manual,
         Automatic
+    }
+
+    public enum CarType : byte
+    {
+        Sport,
+        Regular
     }
 }

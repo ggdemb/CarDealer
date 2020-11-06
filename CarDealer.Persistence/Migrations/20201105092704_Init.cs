@@ -8,19 +8,37 @@ namespace CarDealer.Persistence.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "AvailibleCars",
+                name: "CarStates",
                 columns: table => new
                 {
                     Id = table.Column<long>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    IsDeleted = table.Column<bool>(nullable: false),
+                    Name = table.Column<string>(nullable: true),
+                    Created = table.Column<DateTime>(nullable: false),
+                    CreatedBy = table.Column<string>(nullable: true),
+                    LastModified = table.Column<DateTime>(nullable: false),
+                    LastModifiedBy = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CarStates", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Cars",
+                columns: table => new
+                {
+                    Id = table.Column<long>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     Name_Brand = table.Column<string>(nullable: true),
                     Name_Model = table.Column<string>(nullable: true),
+                    StateId = table.Column<long>(nullable: true),
                     Engine_Type = table.Column<int>(nullable: true),
                     Engine_EuroStandard_Value = table.Column<int>(nullable: true),
                     Engine_EngineCapacity_DisplacementInCm3 = table.Column<decimal>(nullable: true),
                     Engine_BatteryCapacity_CapacityInKwh = table.Column<decimal>(nullable: true),
-                    Transmission = table.Column<int>(nullable: false),
+                    Transmission = table.Column<byte>(nullable: false),
+                    Type = table.Column<byte>(nullable: false),
                     CurrentMileage_MileageInKm = table.Column<int>(nullable: true),
                     BasePrice_Amount = table.Column<decimal>(nullable: true),
                     IsReserved = table.Column<bool>(nullable: false),
@@ -31,7 +49,13 @@ namespace CarDealer.Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AvailibleCars", x => x.Id);
+                    table.PrimaryKey("PK_Cars", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Cars_CarStates_StateId",
+                        column: x => x.StateId,
+                        principalTable: "CarStates",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -40,7 +64,6 @@ namespace CarDealer.Persistence.Migrations
                 {
                     Id = table.Column<long>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    IsDeleted = table.Column<bool>(nullable: false),
                     DateOfItem = table.Column<DateTime>(nullable: false),
                     Mileage_MileageInKm = table.Column<int>(nullable: true),
                     Description = table.Column<string>(nullable: true),
@@ -54,9 +77,9 @@ namespace CarDealer.Persistence.Migrations
                 {
                     table.PrimaryKey("PK_CarHistoryItems", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CarHistoryItems_AvailibleCars_AvailibleCarId",
+                        name: "FK_CarHistoryItems_Cars_AvailibleCarId",
                         column: x => x.AvailibleCarId,
-                        principalTable: "AvailibleCars",
+                        principalTable: "Cars",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -65,6 +88,11 @@ namespace CarDealer.Persistence.Migrations
                 name: "IX_CarHistoryItems_AvailibleCarId",
                 table: "CarHistoryItems",
                 column: "AvailibleCarId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Cars_StateId",
+                table: "Cars",
+                column: "StateId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -73,7 +101,10 @@ namespace CarDealer.Persistence.Migrations
                 name: "CarHistoryItems");
 
             migrationBuilder.DropTable(
-                name: "AvailibleCars");
+                name: "Cars");
+
+            migrationBuilder.DropTable(
+                name: "CarStates");
         }
     }
 }
