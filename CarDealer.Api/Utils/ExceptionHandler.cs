@@ -30,7 +30,7 @@ namespace Api.Utils
         private Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
             // Log exception here
-            string result = JsonConvert.SerializeObject(Envelope.Error(exception.Message));
+            string result = JsonConvert.SerializeObject(Envelope.Error("General error."));
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
             return context.Response.WriteAsync(result);

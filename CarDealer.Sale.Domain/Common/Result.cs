@@ -7,9 +7,9 @@ namespace CarDealer.Domain.Common
     //https://enterprisecraftsmanship.com/posts/functional-c-handling-failures-input-errors/
     public class Result
     {
-        public bool IsSuccess => Errors.Any();
+        public bool IsFailure => Errors.Any();
         public List<string> Errors { get; }
-        public bool IsFailure => !IsSuccess;
+        public bool IsSuccess => !IsFailure;
         protected Result()
         {
             Errors = new List<string>();
@@ -29,6 +29,10 @@ namespace CarDealer.Domain.Common
             Errors.Add(error);
         }
 
+        public static Result Fail(List<string> messages)
+        {
+            return new Result(messages);
+        }
         public static Result Fail(string message)
         {
             return new Result(message);

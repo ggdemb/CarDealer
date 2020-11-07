@@ -33,7 +33,10 @@ namespace CarDealer.Domain.Common
 
             return result;
         }
-
+        public static Result SkipPayload<T>(this Result<T> result)
+        {
+            return Result.Fail(result.Errors);
+        }
         public static Result<K> Map<T, K>(this Result<T> result, Func<T, K> func)
         {
             if (result.IsFailure)

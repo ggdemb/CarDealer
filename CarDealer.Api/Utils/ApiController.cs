@@ -9,7 +9,7 @@ namespace CarDealer.Api.Common
 {
     [ApiController]
     [Route("api/[controller]")]
-    public abstract class ApiController : Controller
+    public abstract class ApiController : ControllerBase
     {
         private IMediator _mediator;
 
@@ -27,16 +27,22 @@ namespace CarDealer.Api.Common
             return base.Ok(Envelope.Ok());
         }
 
+        protected ActionResult<Envelope> Error(List<string> errorMessages)
+        {
+            _unitOfWork.Rollback();
+            return BadRequest(Envelope.Error(errorMessages));
+        }
+
         protected ActionResult<Envelope<T>> Ok<T>(T result)
         {
             _unitOfWork.Commit();
             return base.Ok(Envelope.Ok(result));
         }
 
-        protected ActionResult<Envelope<List<string>>> Error(List<string> errorMessages)
+        protected ActionResult<Envelope<T>> Error<T>(List<string> errorMessages)
         {
             _unitOfWork.Rollback();
-            return BadRequest(Envelope.Error(errorMessages));
+            return BadRequest(Envelope.Error<T>(errorMessages));
         }
     }
 }
