@@ -5,6 +5,10 @@ namespace CarDealer.Domain.Sale.Car
 {
     public class SportCar : AvailibleCar
     {
+        private SportCar()
+        {
+
+        }
         private SportCar(CarName name, Engine engine, TransmissionType transmission, CarMileage currentMileage, Pln basePrice, CarState state, bool isReserved = false)
             : base(name, engine, transmission, currentMileage, basePrice, state, isReserved)
         {

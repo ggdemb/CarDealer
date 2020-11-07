@@ -35,15 +35,10 @@ namespace CarDealer.Domain.Sale.Car
         }
         public Result CanUpdatePrice()
         {
-            var validationResults = "";
 
-            if (IsReserved)
-                validationResults += $"Car is reserved, price cannot be changed\n";
-
-            if (validationResults == "")
-                return Result.Ok();
-            else
-                return Result.Fail(validationResults);
+            return (this).ToResult()
+                 .Ensure(x => x.IsNotReserved, $"Car is reserved, price cannot be changed.")
+                 .SkipPayload();
         }
 
         public Result UpdatePrice(decimal newPriceInPln)
@@ -56,23 +51,15 @@ namespace CarDealer.Domain.Sale.Car
                 return Result.Ok();
             }
             else
-            {
-                return Result.Fail<AvailibleCar>($"Validation fail, cannot create {nameof(AvailibleCar)}");
-            }
+                return Result.Fail(validationResult.Errors);
         }
 
         public static Result CanCreateCar(CarName name, Engine engine, TransmissionType transmission, CarMileage currentMileage, Pln basePrice)
         {
             // you can place your bussines validations here:
-            var validationResults = "";
-            if (transmission == TransmissionType.Manual && engine.HasElectricEngine())
-                validationResults += $"Car can't have {engine.Type} engine and {transmission}\n";
-
-
-            if (validationResults == "")
-                return Result.Ok();
-            else
-                return Result.Fail(validationResults);
+            return (name, engine, transmission, currentMileage, basePrice).ToResult()
+                 .Ensure(x => x.engine.HasElectricEngine() && x.transmission == TransmissionType.Automatic, $"Car can't have electric engine and manual transmission.")
+                 .SkipPayload();
         }
 
         protected static Func<Func<T>, Result<T>> GetCarFactory<T>(CarName name, Engine engine, TransmissionType transmission, CarMileage currentMileage, Pln basePrice, CarState state) where T : AvailibleCar
@@ -82,14 +69,13 @@ namespace CarDealer.Domain.Sale.Car
                 var validationResult = CanCreateCar(name, engine, transmission, currentMileage, basePrice);
                 if (validationResult.IsSuccess)
                 {
-                    var newCar = constructor();
+                    var newSpecificCar = constructor();
                     //AddDomainEvent(new AvailbleCarCreated(Id));
-                    return Result.Ok<T>(newCar);
+                    return Result.Ok<T>(newSpecificCar);
                 }
                 else
-                {
-                    return Result.Fail<T>($"Validation fail, cannot create {typeof(T)}");
-                }
+                    return Result.Fail<T>(validationResult.Errors);
+
             };
         }
 
@@ -116,6 +102,7 @@ namespace CarDealer.Domain.Sale.Car
         public CarMileage CurrentMileage { get; private set; }
         public Pln BasePrice { get; private set; }
         public bool IsReserved { get; private set; }
+        public bool IsNotReserved => !IsReserved;
     }
     public enum TransmissionType : byte
     {
