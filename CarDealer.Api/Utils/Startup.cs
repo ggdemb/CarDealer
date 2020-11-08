@@ -1,6 +1,5 @@
 ﻿using CarDealer.Application;
-using CarDealer.Application.CommonContracts;
-using CarDealer.Domain.Common;
+using CarDealer.Application.Utils;
 using CarDealer.Infrastructure;
 using CarDealer.Persistence;
 using CarDealer.Sale.Domain;
@@ -14,6 +13,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Api.Utils
 {
@@ -41,11 +42,18 @@ namespace Api.Utils
                  {
                      var modelValidationErrors = actionContext.ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage);
                      return new BadRequestObjectResult(Envelope.Error(modelValidationErrors));
+                     //Or maybe return general error "Request payload has invalid structure" and log error details to file/database?
+
                  };
                  //options.SuppressMapClientErrors = true;
                  //options.ClientErrorMapping[StatusCodes.Status404NotFound].Link =
                  //    "https://httpstatuses.com/404";
-             });
+             })
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+            });
+
             services.RegisterPersistanceDependencyInjection(Configuration);
             services.RegisterApplicationDependencyInjection();
             services.RegisterDomainDependencyInjection();
@@ -53,7 +61,16 @@ namespace Api.Utils
             services.RegisterApiDependencyInjection();
             services.AddAntiforgery(options => options.HeaderName = "X-XSRF-TOKEN");
 
-            services.AddSwaggerGen();
+            services.AddSwaggerGen(c =>
+            {
+                c.CustomSchemaIds(x =>
+                {
+                    if (!(x.GetCustomAttributes(typeof(CustomSerializationName), false).FirstOrDefault() is CustomSerializationName customSchemaId))
+                        return x.Name;
+                    else
+                        return customSchemaId.CustomName;
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
