@@ -11,8 +11,7 @@ namespace CarDealer.Persistence.Migrations
                 name: "CarStates",
                 columns: table => new
                 {
-                    Id = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<byte>(nullable: false),
                     Name = table.Column<string>(nullable: true),
                     Created = table.Column<DateTime>(nullable: false),
                     CreatedBy = table.Column<string>(nullable: true),
@@ -32,13 +31,13 @@ namespace CarDealer.Persistence.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name_Brand = table.Column<string>(nullable: true),
                     Name_Model = table.Column<string>(nullable: true),
-                    StateId = table.Column<long>(nullable: true),
+                    StateId = table.Column<byte>(nullable: false),
                     Engine_Type = table.Column<int>(nullable: true),
                     Engine_EuroStandard_Value = table.Column<int>(nullable: true),
                     Engine_EngineCapacity_DisplacementInCm3 = table.Column<decimal>(nullable: true),
                     Engine_BatteryCapacity_CapacityInKwh = table.Column<decimal>(nullable: true),
-                    Transmission = table.Column<byte>(nullable: false),
-                    Type = table.Column<byte>(nullable: false),
+                    Transmission = table.Column<string>(nullable: false),
+                    Type = table.Column<string>(nullable: false),
                     CurrentMileage_MileageInKm = table.Column<int>(nullable: true),
                     BasePrice_Amount = table.Column<decimal>(nullable: true),
                     IsReserved = table.Column<bool>(nullable: false),
@@ -55,7 +54,7 @@ namespace CarDealer.Persistence.Migrations
                         column: x => x.StateId,
                         principalTable: "CarStates",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(

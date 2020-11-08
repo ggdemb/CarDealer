@@ -1,4 +1,4 @@
-﻿using CarDealer.Application.CommonContracts;
+﻿using CarDealer.Application.ExternalContracts;
 using MediatR.Pipeline;
 using Microsoft.Extensions.Logging;
 using System.Threading;

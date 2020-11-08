@@ -1,5 +1,5 @@
-﻿using CarDealer.Application.CommonContracts;
-using CarDealer.Common.CommonContracts;
+﻿using CarDealer.Application.ExternalContracts;
+using CarDealer.Common.ExternalContracts;
 using CarDealer.Domain.Common;
 using System;
 

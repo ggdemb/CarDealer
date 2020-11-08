@@ -1,6 +1,6 @@
 ﻿using Api.Utils;
 using CarDealer.Api.Common;
-using CarDealer.Application.CommonContracts;
+using CarDealer.Application.ExternalContracts;
 using MediatR;
 using MediatR.Pipeline;
 using Microsoft.Extensions.DependencyInjection;

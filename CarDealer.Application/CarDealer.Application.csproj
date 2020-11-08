@@ -19,8 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Common\" />
     <Folder Include="Sale\Queries\" />
-    <Folder Include="Utils\" />
     <Folder Include="Utils\Mappings\" />
   </ItemGroup>
 

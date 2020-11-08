@@ -1,5 +1,5 @@
 ﻿using Api.Utils;
-using CarDealer.Application.CommonContracts;
+using CarDealer.Application.ExternalContracts;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;

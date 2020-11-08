@@ -1,4 +1,4 @@
-﻿using CarDealer.Application.CommonContracts;
+﻿using CarDealer.Application.ExternalContracts;
 using CarDealer.Domain.Common;
 using MediatR;
 using System;

@@ -15,7 +15,7 @@ namespace CarDealer.Domain.SharedKernel
             Amount = amount;
         }
 
-        public decimal Amount { get; set; }
+        public decimal Amount { get; private set; }
 
         public override string ToString()
         {

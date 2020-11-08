@@ -1,6 +1,6 @@
 ﻿using Api.Utils;
 using CarDealer.Api.Common;
-using CarDealer.Application.CommonContracts;
+using CarDealer.Application.ExternalContracts;
 using CarDealer.Application.Sale.Commands;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;

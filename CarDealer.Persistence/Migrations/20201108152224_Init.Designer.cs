@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CarDealer.Persistence.Migrations
 {
     [DbContext(typeof(CarDealerContext))]
-    [Migration("20201105092704_Init")]
+    [Migration("20201108152224_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -44,14 +44,16 @@ namespace CarDealer.Persistence.Migrations
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long?>("StateId")
-                        .HasColumnType("bigint");
-
-                    b.Property<byte>("Transmission")
+                    b.Property<byte>("StateId")
                         .HasColumnType("tinyint");
 
-                    b.Property<byte>("Type")
-                        .HasColumnType("tinyint");
+                    b.Property<string>("Transmission")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -59,7 +61,7 @@ namespace CarDealer.Persistence.Migrations
 
                     b.ToTable("Cars");
 
-                    b.HasDiscriminator<byte>("Type");
+                    b.HasDiscriminator<string>("Type");
                 });
 
             modelBuilder.Entity("CarDealer.Domain.Sale.Car.CarHistoryItem", b =>
@@ -99,10 +101,8 @@ namespace CarDealer.Persistence.Migrations
 
             modelBuilder.Entity("CarDealer.Domain.Sale.Car.CarState", b =>
                 {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<byte>("Id")
+                        .HasColumnType("tinyint");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
@@ -128,21 +128,23 @@ namespace CarDealer.Persistence.Migrations
                 {
                     b.HasBaseType("CarDealer.Domain.Sale.Car.AvailibleCar");
 
-                    b.HasDiscriminator().HasValue((byte)1);
+                    b.HasDiscriminator().HasValue("Regular");
                 });
 
             modelBuilder.Entity("CarDealer.Domain.Sale.Car.SportCar", b =>
                 {
                     b.HasBaseType("CarDealer.Domain.Sale.Car.AvailibleCar");
 
-                    b.HasDiscriminator().HasValue((byte)0);
+                    b.HasDiscriminator().HasValue("Sport");
                 });
 
             modelBuilder.Entity("CarDealer.Domain.Sale.Car.AvailibleCar", b =>
                 {
                     b.HasOne("CarDealer.Domain.Sale.Car.CarState", "State")
-                        .WithMany()
-                        .HasForeignKey("StateId");
+                        .WithMany("Cars")
+                        .HasForeignKey("StateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.OwnsOne("CarDealer.Domain.Sale.Car.CarMileage", "CurrentMileage", b1 =>
                         {

@@ -1,4 +1,4 @@
-﻿using CarDealer.Application.CommonContracts;
+﻿using CarDealer.Application.ExternalContracts;
 using Microsoft.EntityFrameworkCore.Storage;
 using System;
 

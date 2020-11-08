@@ -1,4 +1,4 @@
-﻿namespace CarDealer.Application.CommonContracts
+﻿namespace CarDealer.Application.ExternalContracts
 {
     public interface IExternalSystemClient
     {

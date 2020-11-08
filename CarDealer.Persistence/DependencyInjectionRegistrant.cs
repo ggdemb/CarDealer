@@ -1,4 +1,4 @@
-﻿using CarDealer.Application.CommonContracts;
+﻿using CarDealer.Application.ExternalContracts;
 using CarDealer.Application.Sale;
 using CarDealer.Persistence.Repositories.Sale;
 using Microsoft.EntityFrameworkCore;

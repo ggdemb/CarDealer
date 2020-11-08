@@ -1,4 +1,4 @@
-﻿using CarDealer.Application.CommonContracts;
+﻿using CarDealer.Application.ExternalContracts;
 using CarDealer.Infrastructure.Sale;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
