@@ -1,4 +1,4 @@
-﻿using CarDealer.Application.CommonContracts;
+﻿using CarDealer.Application.ExternalContracts;
 using CarDealer.Domain.Common;
 using CarDealer.Domain.Sale.Car;
 using Microsoft.EntityFrameworkCore;
@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static CarDealer.Domain.Sale.Car.CarState;
 
 namespace CarDealer.Persistence
 {
@@ -53,8 +54,7 @@ namespace CarDealer.Persistence
 
         private void CollectDomainEvents(EntityEntry entry)
         {
-            var aggregateRoot = entry.Entity as AggregateRoot;
-            if (aggregateRoot is object)
+            if (entry.Entity is AggregateRoot aggregateRoot)
             {
                 _domainEvents.AddRange(aggregateRoot.DomainEvents);
                 aggregateRoot.ClearEvents();
@@ -101,6 +101,25 @@ namespace CarDealer.Persistence
                 modelBuilder.Entity(entityType.Name).Property<DateTime>("LastModified");
                 modelBuilder.Entity(entityType.Name).Property<string>("LastModifiedBy");
             }
+
+
+            //required dict/status structure (in separate table)
+            modelBuilder.Entity<AvailibleCar>().HasOne(x => x.State).WithMany(x => x.Cars).IsRequired();
+
+            //required dict/status structure as enum (in same table)
+            modelBuilder.Entity<AvailibleCar>().Property(e => e.Type)
+                .HasConversion(
+                    v => v.ToString(),
+                    v => Enum.Parse<CarType>(v)
+                 );
+
+            modelBuilder.Entity<AvailibleCar>().Property(e => e.Transmission)
+                .HasConversion(
+                    v => v.ToString(),
+                    v => Enum.Parse<TransmissionType>(v)
+                 );
+
+
             base.OnModelCreating(modelBuilder);
         }
     }

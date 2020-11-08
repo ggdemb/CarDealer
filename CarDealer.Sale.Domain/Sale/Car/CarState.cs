@@ -1,33 +1,37 @@
 ﻿using CarDealer.Domain.Common;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CarDealer.Domain.Sale.Car
 {
     public class CarState : Entity
     {
-        //reference data - remember about INTERGATION TESTS. It may be considered as breaking OCP principle.
+        //reference data - alternative way:
         //https://enterprisecraftsmanship.com/posts/reference-data-as-code/
-
-        public static CarState New = new CarState(1, "New");
-        public static CarState Used = new CarState(2, "Used");
-        public static CarState Broken = new CarState(3, "Broken");
-        public CarState(long id, string name)
+        //Remember about integration tests!
+        public CarState()
         {
-            Name = name;
-            Id = id;
-        }
 
+        }
+        protected CarState(CarStateEnum enumState)
+        {
+            Name = enumState.ToString();
+            Id = (byte)enumState;
+        }
+        public new byte Id { get; set; }
+
+        private readonly List<AvailibleCar> _cars;
+        public IReadOnlyList<AvailibleCar> Cars { get => _cars.ToList(); }
         public string Name { get; private set; }
-        public static Result<CarState> GetCarState(Maybe<string> name)
-        {
-            if (name.HasNoValue)
-                return Result.Fail<CarState>($"CarState {nameof(name)} is not specified");
-            if (name.Value == New.Name)
-                return Result.Ok(New);
-            if (name.Value == Used.Name)
-                return Result.Ok(Used);
-            if (name.Value == Broken.Name)
-                return Result.Ok(Broken);
-            return Result.Fail<CarState>($"CarState {nameof(name)} is invalid");
-        }
+
+        public static implicit operator CarState(CarStateEnum @enum) => new CarState(@enum);
+
+        public static implicit operator CarStateEnum(CarState carState) => (CarStateEnum)carState.Id;
+    }
+    public enum CarStateEnum : byte
+    {
+        New = 1,
+        Used = 2,
+        Broken = 3
     }
 }
