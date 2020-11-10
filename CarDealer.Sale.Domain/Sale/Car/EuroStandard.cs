@@ -7,15 +7,23 @@ namespace CarDealer.Domain.Sale.Car
     public class EuroStandard : ValueObject<EuroStandard>
     {
         private readonly string _standardLabael = "EURO";
+        private static readonly int _minEuro = 0;
+        private static readonly int _maxEuro = 10;
         private EuroStandard()
         {
         }
 
-        public EuroStandard(int value) : this()
+        private EuroStandard(int value) : this()
         {
-            if (value <= 0)
-                throw new ArgumentException($"{value} must be grater than zero.");
             Value = value;
+        }
+
+        public static Result<EuroStandard> CreateEuroStandard(int euroStandart)
+        {
+            return (euroStandart).ToResult()
+                .Ensure(x => x > _minEuro, $"{nameof(euroStandart)} must be grater than {_minEuro}.")
+                .Ensure(x => x < _maxEuro, $"{nameof(euroStandart)} must be smaller than {_maxEuro}.")
+                .Map(x => new EuroStandard(x));
         }
 
 

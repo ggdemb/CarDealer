@@ -1,5 +1,4 @@
 ﻿using CarDealer.Application.Utils;
-using CarDealer.Domain.Sale.Car;
 using System;
 
 namespace CarDealer.Application.Sale.Common
@@ -24,9 +23,17 @@ namespace CarDealer.Application.Sale.Common
         Used,
         Broken
     }
-    static class ApplicationEnumsExtensions
+    [CustomSerializationName("EngineType")]
+    public enum CommandEngineType
     {
-        public static TResult Transform<TSource, TResult>(this TSource inputEnum) where TSource : struct where TResult : struct
+        Diesel,
+        Petrol,
+        Hybrid,
+        FullyElectric
+    }
+    internal static class ApplicationEnumsExtensions
+    {
+        internal static TResult ToEquivalent<TSource, TResult>(this TSource inputEnum) where TSource : struct where TResult : struct
         {
             return Enum.Parse<TResult>(inputEnum.ToString());
         }

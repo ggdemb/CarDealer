@@ -7,16 +7,22 @@ namespace CarDealer.Domain.Sale.Car
     public class CarMileage : ValueObject<CarMileage>
     {
         private readonly string _mileageUnitLabel = "km";
+        private static readonly int _minimalMileage = 0;
 
         private CarMileage()
         {
         }
 
-        public CarMileage(int mileageInKm) : this()
+        private CarMileage(int mileageInKm)
         {
-            if (mileageInKm <= 0)
-                throw new ArgumentException($"{mileageInKm} must be grater than zero.");
             MileageInKm = mileageInKm;
+        }
+
+        public static Result<CarMileage> Create(int mileageInKm)
+        {
+            return (mileageInKm).ToResult()
+                .Ensure(mileageInKm => mileageInKm > _minimalMileage, $"{nameof(mileageInKm)} must be grater than {_minimalMileage}.")
+                .Map(mileageInKm => new CarMileage(mileageInKm));
         }
 
         public int MileageInKm { get; private set; }
@@ -30,15 +36,5 @@ namespace CarDealer.Domain.Sale.Car
         {
             yield return MileageInKm;
         }
-
-        //public static explicit operator Email(string email)
-        //{
-        //    return Create(email).Value;
-        //}
-
-        //public static implicit operator string(Email email)
-        //{
-        //    return email.Value;
-        //}
     }
 }

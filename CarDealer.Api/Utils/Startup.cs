@@ -59,6 +59,8 @@ namespace Api.Utils
             services.RegisterDomainDependencyInjection();
             services.RegisterInfrastructureDependencyInjection(Configuration);
             services.RegisterApiDependencyInjection();
+            
+            //Cross Site Request Forgery (CSRF) protection
             services.AddAntiforgery(options => options.HeaderName = "X-XSRF-TOKEN");
 
             services.AddSwaggerGen(c =>

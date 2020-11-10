@@ -1,5 +1,4 @@
 ﻿using CarDealer.Domain.Common;
-using System;
 using System.Collections.Generic;
 
 namespace CarDealer.Domain.Sale.Car
@@ -10,13 +9,31 @@ namespace CarDealer.Domain.Sale.Car
         {
         }
 
-        public Engine(EngineType type, EuroStandard euroStandard, EngineDisplacement engineCapacity, BatteryCapacity batteryCapacity) : this()
+        private Engine(EngineType type, EuroStandard euroStandard, EngineDisplacement engineCapacity, BatteryCapacity batteryCapacity) : this()
         {
             Type = type;
-            EuroStandard = euroStandard ?? throw new ArgumentNullException(nameof(euroStandard));
-            EngineCapacity = engineCapacity ?? throw new ArgumentNullException(nameof(engineCapacity));
-            BatteryCapacity = batteryCapacity ?? throw new ArgumentNullException(nameof(batteryCapacity));
+            EuroStandard = euroStandard;
+            EngineCapacity = engineCapacity;
+            BatteryCapacity = batteryCapacity;
         }
+
+        public static Result<Engine> Create(EngineType engineType, int euroStandart, decimal? engineDisplacementInCm3, decimal? batteryCapacityInKwh)
+        {
+
+            var euroStandartResult = EuroStandard.CreateEuroStandard(euroStandart);
+            var engineDisplacementResult = EngineDisplacement.Create(engineDisplacementInCm3);
+            var batteryCapacityResult = BatteryCapacity.Create(batteryCapacityInKwh);
+
+            var result = Result.CombineErrors(euroStandartResult.Errors, engineDisplacementResult.Errors, batteryCapacityResult.Errors);
+
+            if (result.IsFailure)
+                return Result.Fail<Engine>(result.Errors);
+            else
+            {
+                return Result.Ok(new Engine(engineType, euroStandartResult.Value, engineDisplacementResult.Value, batteryCapacityResult.Value));
+            }
+        }
+
         public bool HasElectricEngine()
         {
             return Type == EngineType.FullyElectric || Type == EngineType.Hybrid;

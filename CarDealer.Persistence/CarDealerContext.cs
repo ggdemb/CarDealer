@@ -3,9 +3,11 @@ using CarDealer.Domain.Common;
 using CarDealer.Domain.Sale.Car;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using static CarDealer.Domain.Sale.Car.CarState;
 
 namespace CarDealer.Persistence
@@ -87,6 +89,7 @@ namespace CarDealer.Persistence
                 d.OwnsOne(p => p.BatteryCapacity);
                 d.OwnsOne(p => p.EngineCapacity);
                 d.OwnsOne(p => p.EuroStandard);
+                d.Property(e => e.Type).InterchangeableWithString();
             }
             );
 
@@ -107,20 +110,21 @@ namespace CarDealer.Persistence
             modelBuilder.Entity<AvailibleCar>().HasOne(x => x.State).WithMany(x => x.Cars).IsRequired();
 
             //required dict/status structure as enum (in same table)
-            modelBuilder.Entity<AvailibleCar>().Property(e => e.Type)
-                .HasConversion(
-                    v => v.ToString(),
-                    v => Enum.Parse<CarType>(v)
-                 );
-
-            modelBuilder.Entity<AvailibleCar>().Property(e => e.Transmission)
-                .HasConversion(
-                    v => v.ToString(),
-                    v => Enum.Parse<TransmissionType>(v)
-                 );
-
+            modelBuilder.Entity<AvailibleCar>().Property(e => e.Type).InterchangeableWithString();
+            modelBuilder.Entity<AvailibleCar>().Property(e => e.Transmission).InterchangeableWithString();
 
             base.OnModelCreating(modelBuilder);
+        }
+
+    }
+    internal static class BuilderExtensions
+    {
+        public static PropertyBuilder InterchangeableWithString<TProperty>(this PropertyBuilder<TProperty> builder) where TProperty : struct
+        {
+            return builder.HasConversion(
+                    @enum => @enum.ToString(),
+                    @string => Enum.Parse<TProperty>(@string)
+                 );
         }
     }
 }

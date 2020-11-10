@@ -1,4 +1,5 @@
 ﻿using CarDealer.Domain.Common;
+using CarDealer.Domain.Sale.Car;
 using CarDealer.Domain.SharedKernel;
 using Microsoft.Extensions.DependencyInjection;
 using NullGuard;
@@ -11,6 +12,7 @@ namespace CarDealer.Sale.Domain
         public static IServiceCollection RegisterDomainDependencyInjection(this IServiceCollection services)
         {
             services.AddSingleton<IDateTime, DateTimeService>();
+            services.AddSingleton<ICarFactory, CarFactory>();
             return services;
         }
     }

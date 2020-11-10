@@ -1,5 +1,4 @@
 ﻿using CarDealer.Domain.Common;
-using CarDealer.Domain.SharedKernel;
 
 namespace CarDealer.Domain.Sale.Car
 {
@@ -9,16 +8,24 @@ namespace CarDealer.Domain.Sale.Car
         {
 
         }
-        private SportCar(CarName name, Engine engine, TransmissionType transmission, CarMileage currentMileage, Pln basePrice, CarState state, bool isReserved = false)
-            : base(name, engine, transmission, currentMileage, basePrice, state, isReserved)
+        private SportCar(string test)
         {
-            Type = CarType.Sport;
+            var test2 = test;
         }
-        public static Result<SportCar> CreateCar(CarName name, Engine engine, TransmissionType transmission, CarMileage currentMileage, Pln basePrice, CarState state)
+        internal static Result<AvailibleCar> CreateCar(string brandName,
+            string modelName,
+            EngineType engineType,
+            int euroStandart,
+            decimal? engineDisplacementInCm3,
+            decimal? batteryCapacityInKwh,
+            TransmissionType transmissionType,
+            int mileageInKm,
+            decimal priceInPln,
+            CarType carType,
+            CarStateEnum state)
         {
-            var carFactory = GetCarFactory<SportCar>(name, engine, transmission, currentMileage, basePrice, state);
-
-            return carFactory(() => new SportCar(name, engine, transmission, currentMileage, basePrice, state));
+            var carFactory = GetCarFactory(brandName, modelName, engineType, euroStandart, engineDisplacementInCm3, batteryCapacityInKwh, transmissionType, mileageInKm, priceInPln, carType, state);
+            return carFactory(() => new SportCar(null));
         }
 
         public override double TaxBase

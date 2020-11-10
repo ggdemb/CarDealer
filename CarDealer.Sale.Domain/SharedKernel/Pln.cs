@@ -7,14 +7,18 @@ namespace CarDealer.Domain.SharedKernel
     public class Pln : ValueObject<Pln>
     {
         private readonly string _currencySymbol = "PLN";
+        private static readonly decimal _minimalPrice = 0.0M;
 
-        public Pln(decimal amount)
+        private Pln(decimal amount)
         {
-            if (amount < 0)
-                throw new ArgumentException($"{amount} must be grater than zero.");
             Amount = amount;
         }
-
+        public static Result<Pln> Create(decimal amount)
+        {
+            return (amount).ToResult()
+                .Ensure(amount => amount > _minimalPrice, $"{nameof(amount)} must be grater than {_minimalPrice}.")
+                .Map(amount => new Pln(amount));
+        }
         public decimal Amount { get; private set; }
 
         public override string ToString()
@@ -26,5 +30,7 @@ namespace CarDealer.Domain.SharedKernel
         {
             yield return Amount;
         }
+
+
     }
 }

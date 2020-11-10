@@ -18,7 +18,8 @@ namespace CarDealer.Application.Sale.Commands
         public CommandTransmissionType TransmissionType { get; set; }
         public int MileageInKm { get; set; }
         public decimal PriceInPln { get; set; }
-        public CommandCarType Type { get; set; }
+        public CommandCarType CarType { get; set; }
+        public CommandEngineType EngineType { get; set; }
         public CommandCarState State { get; set; }
 
     }    

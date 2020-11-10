@@ -13,18 +13,6 @@ namespace CarDealer.Domain.Sale.Car
             _carHistory = new List<CarHistoryItem>();
         }
 
-
-
-        public AvailibleCar(CarName name, Engine engine, TransmissionType transmission, CarMileage currentMileage, Pln basePrice, CarState state, bool isReserved = false)
-        {
-            Name = name;
-            Engine = engine;
-            Transmission = transmission;
-            CurrentMileage = currentMileage;
-            BasePrice = basePrice;
-            State = state;
-            IsReserved = isReserved;
-        }
         public void ToggleReservationState()
         {
             IsReserved = !IsReserved;
@@ -43,39 +31,81 @@ namespace CarDealer.Domain.Sale.Car
 
         public Result UpdatePrice(decimal newPriceInPln)
         {
-            var validationResult = CanUpdatePrice();
-            if (validationResult.IsSuccess)
+            var carValidationResult = CanUpdatePrice();
+            if (carValidationResult.IsSuccess)
             {
-                BasePrice = new Pln(newPriceInPln);
-                AddDomainEvent(new AvailbleCarPriceChanged(Id, newPriceInPln));
-                return Result.Ok();
+                var priceResult = Pln.Create(newPriceInPln);
+                if (priceResult.IsSuccess)
+                {
+                    BasePrice = priceResult.Value;
+                    AddDomainEvent(new AvailbleCarPriceChanged(Id, newPriceInPln));
+                    return Result.Ok();
+                }
+                else
+                    return Result.Fail(priceResult.Errors);
             }
             else
-                return Result.Fail(validationResult.Errors);
+                return Result.Fail(carValidationResult.Errors);
         }
 
-        public static Result CanCreateCar(CarName name, Engine engine, TransmissionType transmission, CarMileage currentMileage, Pln basePrice)
+        private static Result CanCreateCar(Result<CarName> carNameResult, Result<Engine> engineResult, TransmissionType transmission, Result<CarMileage> mileageResult, Result<Pln> priceResult)
         {
-            // you can place your bussines validations here:
-            return (name, engine, transmission, currentMileage, basePrice).ToResult()
-                 .Ensure(x => x.engine.HasElectricEngine() && x.transmission == TransmissionType.Automatic, $"Car can't have electric engine and manual transmission.")
-                 .SkipPayload();
+
+            var subElementsResult = Result.CombineErrors(carNameResult.Errors, engineResult.Errors, mileageResult.Errors, priceResult.Errors);
+            if (subElementsResult.IsSuccess)
+            {
+                return (carName: carNameResult.Value, engine: engineResult.Value, transmission, mileage: mileageResult.Value, price: priceResult.Value).ToResult()
+                     .Ensure(x => x.engine.HasElectricEngine() ? x.transmission == TransmissionType.Automatic : true, $"Car can't have electric engine and manual transmission.")
+                     .SkipPayload();
+            }
+            else
+                return Result.Fail("Car must have valid all sub elements.");
+
         }
 
-        protected static Func<Func<T>, Result<T>> GetCarFactory<T>(CarName name, Engine engine, TransmissionType transmission, CarMileage currentMileage, Pln basePrice, CarState state) where T : AvailibleCar
+
+        protected static Func<Func<AvailibleCar>, Result<AvailibleCar>> GetCarFactory(
+            string brandName,
+            string modelName,
+            EngineType engineType,
+            int euroStandart,
+            decimal? engineDisplacementInCm3,
+            decimal? batteryCapacityInKwh,
+            TransmissionType transmissionType,
+            int mileageInKm,
+            decimal priceInPln,
+            CarType carType,
+            CarStateEnum state)
         {
             return (constructor) =>
             {
-                var validationResult = CanCreateCar(name, engine, transmission, currentMileage, basePrice);
-                if (validationResult.IsSuccess)
+                var carNameResult = CarName.Create(brandName, modelName);
+                var engineResult = Engine.Create(engineType, euroStandart, engineDisplacementInCm3, batteryCapacityInKwh);
+                var mileageResult = CarMileage.Create(mileageInKm);
+                var priceResult = Pln.Create(priceInPln);
+                var carValidationResult = CanCreateCar(carNameResult, engineResult, transmissionType, mileageResult, priceResult);
+
+                var combinedResult = Result.CombineErrors(carNameResult.Errors, engineResult.Errors, mileageResult.Errors, priceResult.Errors, carValidationResult.Errors);
+
+                if (combinedResult.IsFailure)
+                    return Result.Fail<AvailibleCar>(combinedResult.Errors);
+                else
                 {
                     var newSpecificCar = constructor();
-                    //AddDomainEvent(new AvailbleCarCreated(Id));
-                    return Result.Ok<T>(newSpecificCar);
-                }
-                else
-                    return Result.Fail<T>(validationResult.Errors);
 
+                    newSpecificCar.State = state;
+                    newSpecificCar.Type = carType;
+                    newSpecificCar.Transmission = transmissionType;
+                    newSpecificCar.Name = carNameResult.Value;
+                    newSpecificCar.Engine = engineResult.Value;
+                    newSpecificCar.Transmission = transmissionType;
+                    newSpecificCar.CurrentMileage = mileageResult.Value;
+                    newSpecificCar.BasePrice = priceResult.Value;
+                    newSpecificCar.State = state;
+
+                    //AddDomainEvent(new AvailbleCarCreated(Id)); //It It would be good to have here Id as GUID (no need to contact to database);
+                    return Result.Ok(newSpecificCar);
+                }
             };
         }
 
@@ -87,9 +117,16 @@ namespace CarDealer.Domain.Sale.Car
             }
             _carHistory.Add(item);
         }
-        public void UpdateCurrentMileage(int newMileageInKm)
+        public Result UpdateCurrentMileage(int newMileageInKm)
         {
-            CurrentMileage = new CarMileage(newMileageInKm);
+            var result = CarMileage.Create(newMileageInKm);
+            if (result.IsSuccess)
+            {
+                CurrentMileage = result.Value;
+                return Result.Ok();
+            }
+            else
+                return result.SkipPayload();
         }
 
         private readonly List<CarHistoryItem> _carHistory;

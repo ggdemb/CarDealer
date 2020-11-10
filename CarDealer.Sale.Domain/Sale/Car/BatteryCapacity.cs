@@ -12,11 +12,20 @@ namespace CarDealer.Domain.Sale.Car
         private BatteryCapacity()
         {
         }
-        public BatteryCapacity(decimal capacityInKwh) : this()
+        private BatteryCapacity(decimal capacityInKwh) : this()
         {
-            if (capacityInKwh < 0)
-                throw new ArgumentException($"{capacityInKwh} must be equal or grater than zero.");
             CapacityInKwh = capacityInKwh;
+        }
+        public static Result<BatteryCapacity> Create(decimal? capacityInKwh)
+        {
+            if (!capacityInKwh.HasValue || capacityInKwh.Value == 0)
+            {
+                return Result.Ok(NonElectricOrHybridBatteryCapacity);
+            }
+            else
+            {
+                return Result.Ok(new BatteryCapacity(capacityInKwh.Value));
+            }
         }
 
         public decimal CapacityInKwh { get; private set; }

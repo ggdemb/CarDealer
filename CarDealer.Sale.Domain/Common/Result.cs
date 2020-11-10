@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NullGuard;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -27,6 +28,16 @@ namespace CarDealer.Domain.Common
         public void AddError(string error)
         {
             Errors.Add(error);
+        }
+
+        public static Result CombineErrors(params List<string>[] listOfErrorList)
+        {
+            var combinedResult = new Result();
+            foreach (var errorList in listOfErrorList)
+            {
+                combinedResult.Errors.AddRange(errorList);
+            }
+            return combinedResult;
         }
 
         public static Result Fail(List<string> messages)
@@ -67,7 +78,7 @@ namespace CarDealer.Domain.Common
         {
             Value = value;
         }
-        protected internal Result(T value, List<string> errors)
+        protected internal Result([AllowNull] T value, List<string> errors)
            : base(errors)
         {
             Value = value;

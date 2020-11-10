@@ -18,10 +18,10 @@ namespace CarDealer.Domain.Sale.Car
         {
             
             return (brand, model).ToResult()
-                .Ensure(x => string.IsNullOrEmpty(x.brand), "Brand name cannot be empty")
-                .Ensure(x => string.IsNullOrEmpty(x.model), "Brand model cannot be empty")
-                .Ensure(x => x.brand.Length > 50, "Brand name cannot be longer than 50 characters")
-                .Ensure(x => x.model.Length > 55, "Model name cannot be longer than 55 characters")
+                .Ensure(x => !string.IsNullOrEmpty(x.brand), "Brand name cannot be empty")
+                .Ensure(x => !string.IsNullOrEmpty(x.model), "Brand model cannot be empty")
+                .Ensure(x => x.brand.Length < 50, "Brand name cannot be longer than 50 characters")
+                .Ensure(x => x.model.Length < 55, "Model name cannot be longer than 55 characters")
                 .Map(x => new CarName(x));
         }
 
