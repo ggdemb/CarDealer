@@ -7,8 +7,6 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using static CarDealer.Domain.Sale.Car.CarState;
 
 namespace CarDealer.Persistence
 {
@@ -98,11 +96,14 @@ namespace CarDealer.Persistence
 
             foreach (var entityType in modelBuilder.Model.GetEntityTypes().Where(e => !e.IsOwned()))
             {
-                //shadow properties for all entities in CarDealerContext:
-                modelBuilder.Entity(entityType.Name).Property<DateTime>("Created");
-                modelBuilder.Entity(entityType.Name).Property<string>("CreatedBy");
-                modelBuilder.Entity(entityType.Name).Property<DateTime>("LastModified");
-                modelBuilder.Entity(entityType.Name).Property<string>("LastModifiedBy");
+                //if (typeof(IAuditable).IsAssignableFrom(entityType.ClrType))
+                {
+                    //shadow properties for all entities in CarDealerContext:
+                    modelBuilder.Entity(entityType.Name).Property<DateTime>("Created");
+                    modelBuilder.Entity(entityType.Name).Property<string>("CreatedBy");
+                    modelBuilder.Entity(entityType.Name).Property<DateTime>("LastModified");
+                    modelBuilder.Entity(entityType.Name).Property<string>("LastModifiedBy");
+                }
             }
 
 

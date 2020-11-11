@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 using System;
 using System.Linq;
 using System.Text.Json;
@@ -65,6 +66,7 @@ namespace Api.Utils
 
             services.AddSwaggerGen(c =>
             {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
                 c.CustomSchemaIds(x =>
                 {
                     if (!(x.GetCustomAttributes(typeof(CustomSerializationName), false).FirstOrDefault() is CustomSerializationName customSchemaId))

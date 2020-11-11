@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <AssemblyName>CarDealer.Domain</AssemblyName>
     <RootNamespace>CarDealer.Domain</RootNamespace>
   </PropertyGroup>
@@ -38,7 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.9" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
     <PackageReference Include="NullGuard.Fody" Version="3.0.0" />
   </ItemGroup>
 
