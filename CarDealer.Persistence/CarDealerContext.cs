@@ -79,20 +79,47 @@ namespace CarDealer.Persistence
                 .HasValue<SportCar>(CarType.Sport);
 
             //ownedTypes configuration:
-            modelBuilder.Entity<AvailibleCar>().OwnsOne(x => x.BasePrice);
-            modelBuilder.Entity<AvailibleCar>().OwnsOne(x => x.CurrentMileage);
-            modelBuilder.Entity<AvailibleCar>().OwnsOne(x => x.Name);
+            //owned type has issue with HiLo. Workaround:
+            //https://github.com/dotnet/efcore/issues/20740
+            const string Name = "AvailibleCarHiLoSequence";
+            const string OwnedTypesKeyPropertyName = "AvailibleCarId";
+
+            modelBuilder.Entity<AvailibleCar>().OwnsOne(x => x.BasePrice, la =>
+                    {
+                        la.Property<long>(OwnedTypesKeyPropertyName).UseHiLo(Name);
+                    });
+            modelBuilder.Entity<AvailibleCar>().OwnsOne(x => x.CurrentMileage, la =>
+            {
+                la.Property<long>(OwnedTypesKeyPropertyName).UseHiLo(Name);
+            });
+            modelBuilder.Entity<AvailibleCar>().OwnsOne(x => x.Name, la =>
+            {
+                la.Property<long>(OwnedTypesKeyPropertyName).UseHiLo(Name);
+            });
             modelBuilder.Entity<AvailibleCar>().OwnsOne(x => x.Engine, d =>
             {
-                d.OwnsOne(p => p.BatteryCapacity);
-                d.OwnsOne(p => p.EngineCapacity);
-                d.OwnsOne(p => p.EuroStandard);
+                const string NestedOwnedTypesKeyPropertyName = "EngineAvailibleCarId";
+                d.Property<long>(OwnedTypesKeyPropertyName).UseHiLo(Name);
+                d.OwnsOne(p => p.BatteryCapacity, la =>
+                {
+                    la.Property<long>(NestedOwnedTypesKeyPropertyName).UseHiLo(Name);
+                });
+                d.OwnsOne(p => p.EngineCapacity, la =>
+                {
+                    la.Property<long>(NestedOwnedTypesKeyPropertyName).UseHiLo(Name);
+                });
+                d.OwnsOne(p => p.EuroStandard, la =>
+                {
+                    la.Property<long>(NestedOwnedTypesKeyPropertyName).UseHiLo(Name);
+                });
                 d.Property(e => e.Type).InterchangeableWithString();
             }
             );
 
-            modelBuilder.Entity<CarHistoryItem>().OwnsOne(x => x.Mileage);
+            //HiLo configuration:
+            modelBuilder.Entity<AvailibleCar>().Property(e => e.Id).UseHiLo(Name);
 
+            modelBuilder.Entity<CarHistoryItem>().OwnsOne(x => x.Mileage);
 
             foreach (var entityType in modelBuilder.Model.GetEntityTypes().Where(e => !e.IsOwned()))
             {

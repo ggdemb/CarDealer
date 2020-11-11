@@ -103,7 +103,7 @@ namespace CarDealer.Domain.Sale.Car
                     newSpecificCar.BasePrice = priceResult.Value;
                     newSpecificCar.State = state;
 
-                    //AddDomainEvent(new AvailbleCarCreated(Id)); //It It would be good to have here Id as GUID (no need to contact to database);
+                    ///AddDomainEvent(new AvailbleCarCreated(Id)); //Use HiLo, but dispatch event on repository or on overrided Id seter (EF will set Id);
                     return Result.Ok(newSpecificCar);
                 }
             };
@@ -130,7 +130,7 @@ namespace CarDealer.Domain.Sale.Car
         }
 
         private readonly List<CarHistoryItem> _carHistory;
-        public IReadOnlyList<CarHistoryItem> CarHistory { get => _carHistory.ToList(); }
+        public IReadOnlyList<CarHistoryItem> CarHistory => _carHistory.ToList();
         public CarName Name { get; private set; }
         public CarState State { get; private set; }
         public Engine Engine { get; private set; }
