@@ -6,13 +6,13 @@ using System.Linq.Expressions;
 
 namespace CarDealer.Domain.Sale.Car
 {
-    public class ElectricCarSpecification : Specification<AvailibleCar>
+    public class ElectricEngineSpecification : Specification<Engine>
     {
         private readonly IReadOnlyCollection<EngineType> _electricEnginesTypes = new List<EngineType>() { EngineType.FullyElectric, EngineType.Hybrid };
 
-        public override Expression<Func<AvailibleCar, bool>> ToExpression()
+        public override Expression<Func<Engine, bool>> ToExpression()
         {
-            return movie => _electricEnginesTypes.Any(x => x == movie.Engine.Type) && movie.Engine.BatteryCapacity != BatteryCapacity.NonElectricOrHybridBatteryCapacity;
+            return movie => _electricEnginesTypes.Any(x => x == movie.Type) && movie.BatteryCapacity != BatteryCapacity.NonElectricOrHybridBatteryCapacity;
         }
     }
 

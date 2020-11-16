@@ -33,6 +33,13 @@ namespace CarDealer.Domain.Common
 
             return result;
         }
+        public static Result<T> Ensure<T>(this Result<T> result, bool specResult, string errorMessage)
+        {
+            if (!specResult)
+                result.AddError(errorMessage);
+
+            return result;
+        }
         public static Result SkipPayload<T>(this Result<T> result)
         {
             return Result.Fail(result.Errors);

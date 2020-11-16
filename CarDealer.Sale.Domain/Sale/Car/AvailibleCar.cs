@@ -23,9 +23,8 @@ namespace CarDealer.Domain.Sale.Car
         }
         public Result CanUpdatePrice()
         {
-
             return (this).ToResult()
-                 .Ensure(x => x.IsNotReserved, $"Car is reserved, price cannot be changed.")
+                 .Ensure(new NotFixedCarPriceSpecification().IsSatisfiedBy(this), $"Car is reserved, price cannot be changed.")
                  .SkipPayload();
         }
 
@@ -55,7 +54,7 @@ namespace CarDealer.Domain.Sale.Car
             if (subElementsResult.IsSuccess)
             {
                 return (carName: carNameResult.Value, engine: engineResult.Value, transmission, mileage: mileageResult.Value, price: priceResult.Value).ToResult()
-                     .Ensure(x => x.engine.HasElectricEngine() ? x.transmission == TransmissionType.Automatic : true, $"Car can't have electric engine and manual transmission.")
+                     .Ensure(x => !new ElectricEngineSpecification().IsSatisfiedBy(x.engine) || x.transmission == TransmissionType.Automatic, $"Car can't have electric engine and manual transmission.")
                      .SkipPayload();
             }
             else
