@@ -38,5 +38,19 @@ namespace CarDealer.Domain.Sale.Car
         {
             yield return Value;
         }
+
+        public static bool operator <=(EuroStandard a, EuroStandard b)
+        {
+            if (a is null || b is null)
+                return false;
+            return a.Value <= b.Value;
+        }
+
+        public static bool operator >=(EuroStandard a, EuroStandard b)
+        {
+            if (a is null || b is null)
+                return false;
+            return a.Value >= b.Value;
+        }
     }
 }
